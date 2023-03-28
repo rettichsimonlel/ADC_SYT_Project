@@ -140,45 +140,89 @@ void adc_setup()
 int main()
 {
   adc_setup();
-  sei(); //Interrupts aktivieren
+  //sei(); //Interrupts aktivieren
 
   while(1)
   {
     //warten, bis Interrupt ausgelöst wird
+    //int adc_l = ADCL; //Wert der Eingangsspannung im unteren Register
+    //int adc_val = (ADCH << 8) | adc_l;   //ADCH auslesen und die Daten kombinieren
+    //while (ADCSRA & (1 << ADSC));
+
+    /*
+    ADCSRA |= (1 << ADSC); // start ADC conversion
+    while (ADCSRA & (1 << ADSC)); // wait for conversion to complete
+    uint16_t adc_result = ADC; // read ADC result
+    float voltage = adc_result * (1.1 / 1024.0);
+    */
+    uint16_t adc_val = ADC;
+
+    /*
+    if (yes == false) {
+      PORTB |= (1 << PB1);  //LED einschalten
+      yes = true;
+      _delay_ms(1000);
+    }
+    else {
+      PORTB &= ~(1 << PB1); //LED ausschalten
+      yes = false;
+      _delay_ms(1000);
+    }
+    */
+
+    float voltage = (float) adc_val / 1023.0 * 4.1;
+    if (voltage < 4) //LED aktivieren, wenn die Eingangsspannung unter 3V fällt (4V Referenzspannung)
+    { 
+      PORTB |= (1 << PB1);  //LED einschalten
+    }
+    else //LED ausschalten, wenn die Eingangsspannung über 3V liegt
+    {
+      //PORTB &= ~(1 << PB1); //LED ausschalten
+      if (yes == false) {
+        PORTB |= (1 << PB1);  //LED einschalten
+        yes = true;
+        _delay_ms(1000);
+      }
+      else {
+        PORTB &= ~(1 << PB1); //LED ausschalten
+        yes = false;
+        _delay_ms(1000);
+      }
+    }
   }
 }
 
-ISR(ADC_vect) //ADC-Interrupt-Service-Routine
-{
-//  int adc_l = ADCL; //Wert der Eingangsspannung im unteren Register
-//  int adc_val = (ADCH << 8) | adc_l;   //ADCH auslesen und die Daten kombinieren
-  ADCSRA |= (1 << ADSC);
-  while (ADCSRA & (1 << ADSC));
-  uint16_t adc_val = ADC;
-
-  float voltage = (float) adc_val / 1023.0 * 5.0;
-
-  /*
-  if (yes == false) {
-    PORTB |= (1 << PB1);  //LED einschalten
-    yes = true;
-    _delay_ms(1000);
-  }
-  else {
-    PORTB &= ~(1 << PB1); //LED ausschalten
-    yes = false;
-    _delay_ms(1000);
-  }
-  */
-
-  if (voltage < 4) //LED aktivieren, wenn die Eingangsspannung unter 3V fällt (4V Referenzspannung)
-  { 
-    PORTB |= (1 << PB1);  //LED einschalten
-  }
-  else //LED ausschalten, wenn die Eingangsspannung über 3V liegt
-  {
-    //PORTB &= ~(1 << PB1); //LED ausschalten
-  }
-
-  ADCSRA |= (1 << ADIF); //ADC-Interrupt-Flag löschen
-}
+//ISR(ADC_vect) //ADC-Interrupt-Service-Routine
+//{
+////  int adc_l = ADCL; //Wert der Eingangsspannung im unteren Register
+////  int adc_val = (ADCH << 8) | adc_l;   //ADCH auslesen und die Daten kombinieren
+//  ADCSRA |= (1 << ADSC);
+//  while (ADCSRA & (1 << ADSC));
+//  uint16_t adc_val = ADC;
+//
+//  //float voltage = (float) adc_val / 1023.0 * 5.0;
+//
+//  if (yes == false) {
+//    PORTB |= (1 << PB1);  //LED einschalten
+//    yes = true;
+//    _delay_ms(1000);
+//  }
+//  else {
+//    PORTB &= ~(1 << PB1); //LED ausschalten
+//    yes = false;
+//    _delay_ms(1000);
+//  }
+//
+///*
+//  if (voltage < 4) //LED aktivieren, wenn die Eingangsspannung unter 3V fällt (4V Referenzspannung)
+//  { 
+//    PORTB |= (1 << PB1);  //LED einschalten
+//  }
+//  else //LED ausschalten, wenn die Eingangsspannung über 3V liegt
+//  {
+//    //PORTB &= ~(1 << PB1); //LED ausschalten
+//  }
+//*/
+//
+//  ADCSRA |= (1 << ADIF); //ADC-Interrupt-Flag löschen
+//}

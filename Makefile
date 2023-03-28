@@ -1,4 +1,4 @@
-MCU=attiny25		# t45 would also work
+MCU=attiny45		# t45 would also work
 F_CPU=1200000
 CC=avr-gcc
 OBJCOPY=avr-objcopy
@@ -25,8 +25,9 @@ all:
 	${OBJCOPY} -j .text -j .data -O ihex ${TARGET}.bin ${TARGET}.hex	
 	
 flash:
-	avrdude -p ${MCU} -c STK500 -U flash:w:${TARGET}.hex:i -F -P com7
+	avrdude -p ${MCU} -c STK500 -U flash:w:${TARGET}.hex:i -F -P com6
 	
 
 clean:
-	rm -f *.bin *.hex
+	rm *.bin
+	rm *.hex
