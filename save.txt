@@ -2,8 +2,7 @@ MCU=attiny25		# t45 would also work
 F_CPU=1200000
 CC=avr-gcc
 OBJCOPY=avr-objcopy
-CFLAGS=-std=c99 -Wall -g -Os -mmcu=${MCU} -DF_CPU=${F_CPU} -I. -fdata-sections -ffunction-sections
-LDFLAGS=-Wl,--gc-sections
+CFLAGS=-std=c99 -Wall -g -Os -mmcu=${MCU} -DF_CPU=${F_CPU} -I.
 TARGET=main
 SRCS=adc-pwm.c 
 
@@ -20,8 +19,9 @@ SRCS=adc-pwm.c
 # Programer 3: avrrisp2 MKll
 # avrdude -p ${MCU} -c avrisp2 -U flash:w:${TARGET}.hex:i -F -P usb
 
+	
 all:
-	${CC} ${CFLAGS} -o ${TARGET}.bin ${SRCS} ${LDFLAGS}
+	${CC} ${CFLAGS} -o ${TARGET}.bin ${SRCS}
 	avr-size -C --mcu=${MCU} ${TARGET}.bin
 	${OBJCOPY} -j .text -j .data -O ihex ${TARGET}.bin ${TARGET}.hex	
 	
