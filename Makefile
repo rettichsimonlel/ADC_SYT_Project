@@ -1,4 +1,4 @@
-MCU=attiny25		# t45 would also work
+MCU=attiny45		# t45 would also work
 F_CPU=1200000
 CC=avr-gcc
 OBJCOPY=avr-objcopy
