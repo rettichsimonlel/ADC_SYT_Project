@@ -1,25 +1,48 @@
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
+#include <avr/i2c.h>
 
-char tosend[] = {0x01}; // command to turn on LED
+#define SLAVE_ADDRESS 0x10
 
-void spi_setup()
+void i2c_setup()
 {
-    DDRB = (1 << PB1) | (1 << PB2); // set MISO and LED pin as output
-    USICR = (1 << USIWM0);          // enable three-wire mode (SPI)
+    TWBR = 32; // Set I²C clock frequency to 50kHz (assuming 16MHz CPU clock)
+    TWSR = 0;  // Set prescaler bits to 0 for 1:1 prescaler
+    TWCR = (1 << TWEN); // Enable I²C
+}
+
+void i2c_start()
+{
+    TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+    while (!(TWCR & (1 << TWINT)));
+}
+
+void i2c_stop()
+{
+    TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+    _delay_ms(10);
+}
+
+void i2c_write(uint8_t data)
+{
+    TWDR = data;
+    TWCR = (1 << TWINT) | (1 << TWEN);
+    while (!(TWCR & (1 << TWINT)));
 }
 
 int main()
 {
-    spi_setup();
-
+    i2c_setup();
+    
     while (1) {
+        i2c_start();
+        i2c_write(SLAVE_ADDRESS << 1); // Send slave address with write bit
+
         // send command to turn on LED
-        USIDR = tosend[0];
-        USISR = (1 << USIOIF); // clear counter overflow flag
-        while ((USISR & (1 << USIOIF)) == 0) {
-            USICR |= (1 << USICLK) | (1 << USITC); // enable clock for transmission
-        }
+        i2c_write(0x01); // command to turn on LED
+
+        i2c_stop();
 
         // wait for the slave to respond
         _delay_ms(100);
