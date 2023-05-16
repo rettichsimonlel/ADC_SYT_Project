@@ -25,7 +25,7 @@ all:
 	${OBJCOPY} -j .text -j .data -O ihex ${TARGET}.bin ${TARGET}.hex	
 	
 flash:
-	avrdude -p ${MCU} -c STK500 -U flash:w:${TARGET}.hex:i -F -P com5
+	avrdude -p ${MCU} -c STK500 -U flash:w:${TARGET}.hex:i -F -P com6
 	
 
 clean:

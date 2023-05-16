@@ -26,9 +26,28 @@ void i2c_send(uint8_t data)
     while (!(TWCR & (1 << TWINT)));
 }
 
+void initialize_LED()
+{
+    // Configure the LED pin as an output
+    DDRB |= (1 << PB3);
+}
+
+void turn_on_LED()
+{
+    // Turn on the LED
+    PORTB |= (1 << PB3);
+}
+
+void turn_off_LED()
+{
+    // Turn off the LED
+    PORTB &= ~(1 << PB3);
+}
+
 int main()
 {
     i2c_setup(SLAVE_ADDRESS);
+    initialize_LED();
     sei(); // Enable global interrupts
     
     while (1) {
@@ -37,8 +56,11 @@ int main()
         if ((TWSR & 0xF8) == TW_SR_SLA_ACK) { // Address match
             i2c_receive(); // Receive data
             if (received_data == 0x01) {
-                // Turn on LED
-                // Code to turn on the LED goes here
+                // Turn on the LED
+                turn_on_LED();
+            } else {
+                // Turn off the LED (or implement other commands)
+                turn_off_LED();
             }
         }
 
